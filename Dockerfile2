@@ -1,0 +1,8 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+RUN dotnet tool install --global dotnet-ef --version 7.0.14
+COPY . .
+WORKDIR ./Promact.CustomerSuccess.Platform
+RUN dotnet build Promact.CustomerSuccess.Platform.csproj
+RUN dotnet dev-certs https
+EXPOSE 4437
+CMD ["dotnet", "run"]

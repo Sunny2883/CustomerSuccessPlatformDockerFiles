@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  dotnet-app:
+    build:
+      context: ./customer-success-platformServer
+      dockerfile: Dockerfile2
+    ports:
+      - "4437:4437"  
+    depends_on:
+      - postgres
+
+  angular-app:
+    build:
+      context: ./CustomerSuccessPlatform
+      dockerfile: Dockerfile1
+    ports:
+      - "4200:4200"  
+    command: npm start -- --host 0.0.0.0
+    depends_on:
+      - dotnet-app
+
+  postgres:
+    image: postgres:latest
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: "123456"
+      POSTGRES_USER: postgres
+      POSTGRES_DB: CustomerSuccessPlatformDB
