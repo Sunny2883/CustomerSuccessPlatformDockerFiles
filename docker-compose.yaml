@@ -9,6 +9,12 @@ services:
       - "4437:4437"  
     depends_on:
       - postgres
+      - migration-service
+    environment:
+       Database: CustomerSuccessPlatformDB
+       Username: postgres
+       Password: 123456
+        
 
   angular-app:
     build:
@@ -19,7 +25,20 @@ services:
     command: npm start -- --host 0.0.0.0
     depends_on:
       - dotnet-app
-
+  migration-service:  # Service for running migrations
+    image: mcr.microsoft.com/dotnet/sdk:8.0
+    volumes:
+      - ./customer-success-platformServer:/app  # Mount the application code
+    depends_on:
+      - postgres
+    environment:
+      Database: CustomerSuccessPlatformDB
+      Username: postgres
+      Password: 123456
+    command: >
+      bash -c "dotnet tool install --global dotnet-ef && 
+               cd /app && 
+               dotnet ef database update"
   postgres:
     image: postgres:latest
     ports:
@@ -28,3 +47,10 @@ services:
       POSTGRES_PASSWORD: "123456"
       POSTGRES_USER: postgres
       POSTGRES_DB: CustomerSuccessPlatformDB
+    volumes:
+     - type: volume
+       source: db-data
+       target: /var/lib/postgresql/data
+volumes:
+  db-data:
+    
